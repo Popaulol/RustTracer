@@ -26,16 +26,6 @@ impl Point3 {
 }
 
 impl Point3 {
-    pub(crate) fn x(&self) -> f64 {
-        self.x
-    }
-    pub(crate) fn y(&self) -> f64 {
-        self.y
-    }
-    pub(crate) fn z(&self) -> f64 {
-        self.z
-    }
-
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x() + self.y * other.y() + self.z * other.z()
     }

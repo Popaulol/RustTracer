@@ -10,10 +10,6 @@ impl Interval {
 }
 
 impl Interval {
-    fn contains(&self, x: f64) -> bool {
-        self.min <= x && x <= self.max
-    }
-
     pub fn surrounds(&self, x: f64) -> bool {
         self.min < x && x < self.max
     }
@@ -31,6 +27,3 @@ impl Default for Interval {
         }
     }
 }
-
-const EMPTY: Interval = Interval::new(f64::INFINITY, -f64::INFINITY);
-const UNIVERSE: Interval = Interval::new(-f64::INFINITY, f64::INFINITY);

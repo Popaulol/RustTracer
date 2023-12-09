@@ -192,8 +192,7 @@ impl Camera {
 
         let viewport_upper_left =
             self.center - (self.focus_dist * self.w) - viewport_u / 2.0 - viewport_v / 2.0;
-        self.pixel_00_loc =
-            &viewport_upper_left + 0.5 * (&self.pixel_delta_u + &self.pixel_delta_v);
+        self.pixel_00_loc = &viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
 
         let defocus_radius = self.focus_dist * (self.defocus_angle / 2.0).to_radians().tan();
         self.defocus_disk_u = self.u * defocus_radius;
