@@ -87,7 +87,7 @@ impl ops::Mul<Color> for f64 {
     type Output = Color;
 
     fn mul(self, rhs: Color) -> Self::Output {
-        self * rhs
+        Self::Output::new(self.r() * rhs, self.g() * rhs, self.b() * rhs)
     }
 }
 
