@@ -166,7 +166,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
 
-        return Ray::new(ray_origin, ray_direction);
+        Ray::new(ray_origin, ray_direction)
     }
 
     fn initialize(&mut self) {

@@ -2,9 +2,9 @@ use crate::color::Color;
 use crate::hit_record::HitRecord;
 use crate::material::Material;
 use crate::ray::Ray;
-use crate::vec3::Vec3;
+
 use rand::random;
-use std::rc::Rc;
+
 
 pub struct Dielectric {
     index_of_refraction: f64,

@@ -2,8 +2,8 @@ mod sphere;
 
 use crate::hit_record::HitRecord;
 use crate::interval::Interval;
-use crate::material::Material;
-use crate::{Point3, Ray, Vec3};
+
+use crate::{Ray};
 pub use sphere::Sphere;
 use std::rc::Rc;
 

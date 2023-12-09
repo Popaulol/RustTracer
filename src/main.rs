@@ -1,13 +1,13 @@
 use chrono::Utc;
-use std::io::prelude::*;
-use std::path::StripPrefixError;
+
+
 use std::rc::Rc;
 
 use rand::{thread_rng, Rng};
 
 use crate::camera::Camera;
 use crate::color::Color;
-use crate::hittable::{Hittable, HittableList, Sphere};
+use crate::hittable::{HittableList, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
