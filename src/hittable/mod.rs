@@ -3,7 +3,7 @@ mod sphere;
 use crate::hit_record::HitRecord;
 use crate::interval::Interval;
 
-use crate::{Ray};
+use crate::Ray;
 pub use sphere::Sphere;
 use std::rc::Rc;
 

@@ -5,7 +5,6 @@ use crate::ray::Ray;
 
 use rand::random;
 
-
 pub struct Dielectric {
     index_of_refraction: f64,
 }
