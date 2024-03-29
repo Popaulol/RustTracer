@@ -17,6 +17,10 @@ impl Interval {
     pub fn clamp(&self, x: f64) -> f64 {
         x.clamp(self.min, self.max)
     }
+
+    pub fn contains(&self, x: f64) -> bool {
+        return self.min <= x && x <= self.max;
+    }
 }
 
 impl Default for Interval {

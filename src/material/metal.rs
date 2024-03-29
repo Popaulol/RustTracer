@@ -25,7 +25,11 @@ impl Material for Metal {
         scattered: &mut Ray,
     ) -> bool {
         let reflected = r_in.direction().unit_vector().reflected(&rec.normal);
-        *scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_unit_vector());
+        *scattered = Ray::new(
+            rec.p,
+            reflected + self.fuzz * Vec3::random_unit_vector(),
+            r_in.time(),
+        );
         *attenuation = self.albedo;
         scattered.direction().dot(&rec.normal) > 0.0
     }
