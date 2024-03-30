@@ -1,4 +1,5 @@
 use crate::interval::Interval;
+use image::Rgb;
 use rand::Rng;
 use std::fmt::{Display, Formatter};
 use std::ops;
@@ -56,6 +57,21 @@ impl Color {
         self.b
     }
 
+    fn channel_to_u8(channel: f64) -> u8 {
+        let intensity = Interval::new(0.0, 0.999);
+        (256.0 * intensity.clamp(channel)) as u8
+    }
+
+    pub fn r_as_u8(&self) -> u8 {
+        Self::channel_to_u8(self.r)
+    }
+    pub fn g_as_u8(&self) -> u8 {
+        Self::channel_to_u8(self.g)
+    }
+    pub fn b_as_u8(&self) -> u8 {
+        Self::channel_to_u8(self.b)
+    }
+
     pub fn sample_scale(&mut self, samples: i32) {
         let scale = 1.0 / samples as f64;
         self.r *= scale;
@@ -74,12 +90,27 @@ impl Color {
 
 impl Display for Color {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let intensity = Interval::new(0.0, 0.999);
-        let ir = (256.0 * intensity.clamp(self.r)) as u8;
-        let ig = (256.0 * intensity.clamp(self.g)) as u8;
-        let ib = (256.0 * intensity.clamp(self.b)) as u8;
+        let ir = self.r_as_u8();
+        let ig = self.g_as_u8();
+        let ib = self.b_as_u8();
 
         write!(f, "{} {} {}", ir, ig, ib)
+    }
+}
+
+impl From<Rgb<u8>> for Color {
+    fn from(value: Rgb<u8>) -> Self {
+        Self::new(
+            value.0[0] as f64 / 255.0,
+            value.0[1] as f64 / 255.0,
+            value.0[2] as f64 / 255.0,
+        )
+    }
+}
+
+impl Into<Rgb<u8>> for Color {
+    fn into(self) -> Rgb<u8> {
+        Rgb([self.r_as_u8(), self.b_as_u8(), self.g_as_u8()])
     }
 }
 

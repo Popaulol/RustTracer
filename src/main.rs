@@ -10,7 +10,7 @@ use crate::hittable::{BvhNode, HittableList, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
-use crate::texture::CheckerTexture;
+use crate::texture::{CheckerTexture, ImageTexture};
 use crate::vec3::Vec3;
 
 mod aabb;
@@ -165,8 +165,30 @@ fn two_spheres() -> std::io::Result<()> {
     Ok(())
 }
 
+fn earth() {
+    let earth_texture = Rc::new(ImageTexture::new("/home/Strawby/Downloads/earthmap.jpg"));
+    let earth_surface = Rc::new(Lambertian::new(earth_texture));
+    let globe = Sphere::new(Point3::new(0.0, 0.0, 0.0), 2.0, earth_surface);
+
+    Camera::default()
+        .aspect_ratio(16.0 / 9.0)
+        .image_width(400)
+        .samples_per_pixel(100)
+        .max_depth(50)
+        .vfov(20.0)
+        .lookfrom(Point3::new(0.0, 0.0, 12.0))
+        .lookat(Point3::new(0.0, 0.0, 0.0))
+        .vup(Vec3::new(0.0, 1.0, 0.0))
+        .defocus_angle(0.0)
+        .render(
+            format!("renders/{}.ppm", Utc::now().to_rfc2822()).as_str(),
+            &globe,
+        )
+        .unwrap();
+}
+
 fn main() -> std::io::Result<()> {
-    two_spheres()?;
+    earth();
 
     Ok(())
 }
