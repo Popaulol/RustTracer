@@ -38,10 +38,6 @@ impl Point3 {
     pub fn dot(&self, other: &Vec3) -> f64 {
         self.x * other.x() + self.y * other.y() + self.z * other.z()
     }
-
-    pub fn to_vec3(self) -> Vec3 {
-        Vec3::new(self.x, self.y, self.z)
-    }
 }
 
 impl ops::Add<Vec3> for &Point3 {
@@ -116,5 +112,11 @@ impl ops::Index<i32> for Point3 {
                 panic!("Invalid Index on Point3")
             }
         }
+    }
+}
+
+impl Into<Vec3> for Point3 {
+    fn into(self) -> Vec3 {
+        Vec3::new(self.x, self.y, self.z)
     }
 }

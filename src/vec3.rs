@@ -3,6 +3,7 @@ use std::ops;
 use rand::{thread_rng, Rng};
 
 use crate::color::Color;
+use crate::point3::Point3;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Vec3 {
@@ -263,5 +264,11 @@ impl ops::Index<i32> for Vec3 {
                 panic!("Invalid Index on Vec3")
             }
         }
+    }
+}
+
+impl Into<Point3> for Vec3 {
+    fn into(self) -> Point3 {
+        Point3::new(self.x, self.y, self.z)
     }
 }

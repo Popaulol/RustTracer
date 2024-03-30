@@ -10,6 +10,7 @@ use crate::hittable::{BvhNode, HittableList, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
+use crate::texture::CheckerTexture;
 use crate::vec3::Vec3;
 
 mod aabb;
@@ -21,19 +22,24 @@ mod interval;
 mod material;
 mod point3;
 mod ray;
+mod texture;
 mod vec3;
 
-fn main() -> std::io::Result<()> {
+fn random_spheres() -> std::io::Result<()> {
     let mut rng = thread_rng();
 
     let mut world = HittableList::default();
 
-    let material_ground = Rc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-
+    //let material_ground = Rc::new(Lambertian::new_with_color(Color::new(0.5, 0.5, 0.5)));
+    let checker = Rc::new(Lambertian::new(Rc::new(CheckerTexture::new_with_colours(
+        0.32,
+        Color::new(0.2, 0.3, 0.1),
+        Color::new(0.9, 0.9, 0.9),
+    ))));
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, -1000.0, -1.0),
         1000.0,
-        material_ground,
+        checker,
     )));
 
     for a in -11..11 {
@@ -48,7 +54,7 @@ fn main() -> std::io::Result<()> {
             if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     let albedo = Color::random() * Color::random();
-                    let material = Rc::new(Lambertian::new(albedo));
+                    let material = Rc::new(Lambertian::new_with_color(albedo));
                     let center2 = center + &Vec3::new(0.0, rng.gen_range(0.0..0.2), 0.0);
                     world.add(Rc::new(Sphere::new_moving(center, center2, 0.2, material)))
                 } else if choose_mat < 0.95 {
@@ -74,7 +80,7 @@ fn main() -> std::io::Result<()> {
         material1.clone(),
     )));
 
-    let material2 = Rc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let material2 = Rc::new(Lambertian::new_with_color(Color::new(0.4, 0.2, 0.1)));
     world.add(Rc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
         1.0,
@@ -117,6 +123,50 @@ fn main() -> std::io::Result<()> {
             format!("renders/{}.ppm", Utc::now().to_rfc2822()).as_str(),
             &world,
         )?;
+
+    Ok(())
+}
+
+fn two_spheres() -> std::io::Result<()> {
+    let mut world = HittableList::default();
+
+    let checker = Rc::new(CheckerTexture::new_with_colours(
+        0.8,
+        Color::new(0.2, 0.3, 0.1),
+        Color::new(0.9, 0.9, 0.9),
+    ));
+    let material = Rc::new(Lambertian::new(checker));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -10.0, 0.0),
+        10.0,
+        material.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 10.0, 0.0),
+        10.0,
+        material.clone(),
+    )));
+
+    Camera::default()
+        .aspect_ratio(16.0 / 9.0)
+        .image_width(400)
+        .samples_per_pixel(100)
+        .max_depth(50)
+        .vfov(20.0)
+        .lookfrom(Point3::new(13.0, 2.0, 3.0))
+        .lookat(Point3::new(0.0, 0.0, 0.0))
+        .vup(Vec3::new(0.0, 1.0, 0.0))
+        .defocus_angle(0.0)
+        .render(
+            format!("renders/{}.ppm", Utc::now().to_rfc2822()).as_str(),
+            &world,
+        )?;
+
+    Ok(())
+}
+
+fn main() -> std::io::Result<()> {
+    two_spheres()?;
 
     Ok(())
 }

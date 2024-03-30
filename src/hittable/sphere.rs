@@ -7,7 +7,6 @@ use crate::point3::Point3;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use std::rc::Rc;
-
 pub struct Sphere {
     center: Point3,
     radius: f64,
@@ -52,6 +51,14 @@ impl Sphere {
     fn center(&self, time: f64) -> Point3 {
         self.center + &(time * self.center_vec)
     }
+
+    fn get_sphere_uv(p: &Point3, u: &mut f64, v: &mut f64) {
+        let theta = (-p.y()).acos();
+        let phi = (-p.z()).atan2(p.x()) + std::f64::consts::PI;
+
+        *u = phi / (2.0 * std::f64::consts::PI);
+        *v = theta / std::f64::consts::PI;
+    }
 }
 
 impl Hittable for Sphere {
@@ -85,6 +92,7 @@ impl Hittable for Sphere {
         rec.p = r.at(rec.t);
         let outward_normal = (rec.p - center) / self.radius;
         rec.set_face_normal(r, outward_normal);
+        Self::get_sphere_uv(&outward_normal.into(), &mut rec.u, &mut rec.v);
         rec.material = Some(self.material.clone());
 
         true
