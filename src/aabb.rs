@@ -4,6 +4,7 @@ use crate::ray::Ray;
 use std::mem::swap;
 
 #[derive(Debug, Copy, Clone)]
+#[derive(Default)]
 pub struct Aabb {
     pub x: Interval,
     pub y: Interval,
@@ -64,16 +65,8 @@ impl Aabb {
                 return false;
             }
         }
-        return true;
+        true
     }
 }
 
-impl Default for Aabb {
-    fn default() -> Self {
-        Self {
-            x: Interval::default(),
-            y: Default::default(),
-            z: Default::default(),
-        }
-    }
-}
+

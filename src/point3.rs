@@ -115,8 +115,8 @@ impl ops::Index<i32> for Point3 {
     }
 }
 
-impl Into<Vec3> for Point3 {
-    fn into(self) -> Vec3 {
-        Vec3::new(self.x, self.y, self.z)
+impl From<Point3> for Vec3 {
+    fn from(val: Point3) -> Self {
+        Vec3::new(val.x, val.y, val.z)
     }
 }

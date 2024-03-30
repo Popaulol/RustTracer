@@ -27,7 +27,7 @@ impl Interval {
     }
 
     pub fn contains(&self, x: f64) -> bool {
-        return self.min <= x && x <= self.max;
+        self.min <= x && x <= self.max
     }
 
     pub fn expand(&self, delta: f64) -> Self {
