@@ -3,8 +3,7 @@ use crate::point3::Point3;
 use crate::ray::Ray;
 use std::mem::swap;
 
-#[derive(Debug, Copy, Clone)]
-#[derive(Default)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Aabb {
     pub x: Interval,
     pub y: Interval,
@@ -44,13 +43,13 @@ impl Aabb {
 
     pub fn hit(&self, r: &Ray, ray_t: &mut Interval) -> bool {
         for a in 0..3 {
-            let invD = 1.0 / r.direction()[a];
+            let inv_d = 1.0 / r.direction()[a];
             let orig = r.origin()[a];
 
-            let mut t0 = (self.axis(a).min - orig) * invD;
-            let mut t1 = (self.axis(a).max - orig) * invD;
+            let mut t0 = (self.axis(a).min - orig) * inv_d;
+            let mut t1 = (self.axis(a).max - orig) * inv_d;
 
-            if invD < 0.0 {
+            if inv_d < 0.0 {
                 swap(&mut t0, &mut t1)
             }
 
@@ -68,5 +67,3 @@ impl Aabb {
         true
     }
 }
-
-
