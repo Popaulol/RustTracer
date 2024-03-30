@@ -1,3 +1,4 @@
+#[derive(Debug, Copy, Clone)]
 pub struct Interval {
     pub(crate) min: f64,
     pub(crate) max: f64,
@@ -6,6 +7,13 @@ pub struct Interval {
 impl Interval {
     pub const fn new(min: f64, max: f64) -> Self {
         Self { min, max }
+    }
+
+    pub fn combined(&self, other: Interval) -> Self {
+        Self {
+            min: self.min.min(other.min),
+            max: self.max.max(other.max),
+        }
     }
 }
 
@@ -20,6 +28,11 @@ impl Interval {
 
     pub fn contains(&self, x: f64) -> bool {
         return self.min <= x && x <= self.max;
+    }
+
+    pub fn expand(&self, delta: f64) -> Self {
+        let padding = delta / 2.0;
+        Self::new(self.min - padding, self.max + padding)
     }
 }
 

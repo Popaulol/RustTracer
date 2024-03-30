@@ -23,6 +23,15 @@ impl Point3 {
     pub(crate) fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
+    pub fn x(&self) -> f64 {
+        self.x
+    }
+    pub fn y(&self) -> f64 {
+        self.y
+    }
+    pub fn z(&self) -> f64 {
+        self.z
+    }
 }
 
 impl Point3 {
@@ -92,5 +101,20 @@ impl ops::Sub<Point3> for Point3 {
 
     fn sub(self, rhs: Point3) -> Self::Output {
         &self - rhs
+    }
+}
+
+impl ops::Index<i32> for Point3 {
+    type Output = f64;
+
+    fn index(&self, index: i32) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => {
+                panic!("Invalid Index on Point3")
+            }
+        }
     }
 }

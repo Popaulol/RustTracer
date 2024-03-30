@@ -250,3 +250,18 @@ impl ops::Mul<f64> for Vec3 {
         }
     }
 }
+
+impl ops::Index<i32> for Vec3 {
+    type Output = f64;
+
+    fn index(&self, index: i32) -> &Self::Output {
+        match index {
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
+            _ => {
+                panic!("Invalid Index on Vec3")
+            }
+        }
+    }
+}

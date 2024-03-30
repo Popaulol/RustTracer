@@ -6,12 +6,13 @@ use rand::{thread_rng, Rng};
 
 use crate::camera::Camera;
 use crate::color::Color;
-use crate::hittable::{HittableList, Sphere};
+use crate::hittable::{BvhNode, HittableList, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
+mod aabb;
 mod camera;
 mod color;
 mod hit_record;
@@ -98,6 +99,8 @@ fn main() -> std::io::Result<()> {
         -0.9,
         material4,
     )));
+
+    let world = BvhNode::from_hittable_list(world);
 
     Camera::default()
         .aspect_ratio(16.0 / 9.0)
