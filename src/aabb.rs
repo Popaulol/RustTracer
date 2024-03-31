@@ -66,4 +66,25 @@ impl Aabb {
         }
         true
     }
+
+    pub fn pad(&self) -> Aabb {
+        let delta = 0.0001;
+        let x = if (self.x.size() >= delta) {
+            self.x
+        } else {
+            self.x.expand(delta)
+        };
+        let y = if (self.y.size() >= delta) {
+            self.y
+        } else {
+            self.y.expand(delta)
+        };
+        let z = if (self.z.size() >= delta) {
+            self.z
+        } else {
+            self.z.expand(delta)
+        };
+
+        Aabb::new(x, y, z)
+    }
 }

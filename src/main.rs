@@ -6,7 +6,7 @@ use rand::{thread_rng, Rng};
 
 use crate::camera::Camera;
 use crate::color::Color;
-use crate::hittable::{BvhNode, HittableList, Sphere};
+use crate::hittable::{BvhNode, HittableList, Quad, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
@@ -221,8 +221,65 @@ fn two_perlin_spheres() {
         .unwrap();
 }
 
+fn quads() {
+    let mut world = HittableList::default();
+
+    let red = Rc::new(Lambertian::new_with_color(Color::new(1.0, 0.2, 0.2)));
+    let green = Rc::new(Lambertian::new_with_color(Color::new(0.2, 1.0, 0.2)));
+    let blue = Rc::new(Lambertian::new_with_color(Color::new(0.2, 0.2, 1.0)));
+    let orange = Rc::new(Lambertian::new_with_color(Color::new(1.0, 0.5, 0.0)));
+    let teal = Rc::new(Lambertian::new_with_color(Color::new(0.2, 0.8, 0.8)));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(-3.0, -2.0, 5.0),
+        Vec3::new(0.0, 0.0, -4.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        red,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, -2.0, 0.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        green,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(3.0, -2.0, 1.0),
+        Vec3::new(0.0, 0.0, 4.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        blue,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, 3.0, 1.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 4.0),
+        orange,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, -3.0, 5.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -4.0),
+        teal,
+    )));
+
+    Camera::default()
+        .aspect_ratio(1.0)
+        .image_width(400)
+        .samples_per_pixel(100)
+        .max_depth(50)
+        .vfov(80.0)
+        .lookfrom(Point3::new(0.0, 0.0, 9.0))
+        .lookat(Point3::new(0.0, 0.0, 0.0))
+        .vup(Vec3::new(0.0, 1.0, 0.0))
+        .defocus_angle(0.0)
+        .render(
+            format!("renders/{}.ppm", Utc::now().to_rfc2822()).as_str(),
+            &world,
+        )
+        .unwrap();
+}
+
 fn main() -> std::io::Result<()> {
-    two_perlin_spheres();
+    quads();
 
     Ok(())
 }
