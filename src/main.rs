@@ -10,7 +10,7 @@ use crate::hittable::{BvhNode, HittableList, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
-use crate::texture::{CheckerTexture, ImageTexture};
+use crate::texture::{CheckerTexture, ImageTexture, MarbleTexture, NoiseTexture};
 use crate::vec3::Vec3;
 
 mod aabb;
@@ -20,6 +20,7 @@ mod hit_record;
 mod hittable;
 mod interval;
 mod material;
+mod noise;
 mod point3;
 mod ray;
 mod texture;
@@ -187,8 +188,41 @@ fn earth() {
         .unwrap();
 }
 
+fn two_perlin_spheres() {
+    let mut world = HittableList::default();
+
+    let perlin_texture = Rc::new(MarbleTexture::new(4.0));
+    let perlin_material = Rc::new(Lambertian::new(perlin_texture));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        perlin_material.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        perlin_material,
+    )));
+
+    Camera::default()
+        .aspect_ratio(16.0 / 9.0)
+        .image_width(400)
+        .samples_per_pixel(100)
+        .max_depth(50)
+        .vfov(20.0)
+        .lookfrom(Point3::new(12.0, 2.0, 3.0))
+        .lookat(Point3::new(0.0, 0.0, 0.0))
+        .vup(Vec3::new(0.0, 1.0, 0.0))
+        .defocus_angle(0.0)
+        .render(
+            format!("renders/{}.ppm", Utc::now().to_rfc2822()).as_str(),
+            &world,
+        )
+        .unwrap();
+}
+
 fn main() -> std::io::Result<()> {
-    earth();
+    two_perlin_spheres();
 
     Ok(())
 }

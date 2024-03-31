@@ -1,4 +1,5 @@
 use std::ops;
+use std::ops::{Mul, MulAssign};
 
 use crate::vec3::Vec3;
 
@@ -118,5 +119,21 @@ impl ops::Index<i32> for Point3 {
 impl From<Point3> for Vec3 {
     fn from(val: Point3) -> Self {
         Vec3::new(val.x, val.y, val.z)
+    }
+}
+
+impl Mul<&Point3> for f64 {
+    type Output = Point3;
+
+    fn mul(self, rhs: &Point3) -> Self::Output {
+        Point3::new(self * rhs.x, self * rhs.y, self * rhs.z)
+    }
+}
+
+impl MulAssign<f64> for Point3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
     }
 }

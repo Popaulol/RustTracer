@@ -130,6 +130,14 @@ impl ops::Mul<&Color> for f64 {
     }
 }
 
+impl ops::Mul<f64> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self::Output::new(self.r * rhs, self.g * rhs, self.b * rhs)
+    }
+}
+
 impl ops::Add for Color {
     type Output = Color;
 
