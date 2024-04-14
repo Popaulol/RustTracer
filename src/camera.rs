@@ -18,6 +18,7 @@ pub struct Camera {
     image_width: i32,
     samples_per_pixel: i32,
     max_depth: i32,
+    background: Color,
 
     vfov: f64,
     lookfrom: Point3,
@@ -40,29 +41,31 @@ pub struct Camera {
 }
 
 impl Camera {
-    fn ray_color(r: &Ray, depth: i32, world: &impl Hittable) -> Color {
+    fn ray_color(&self, r: &Ray, depth: i32, world: &impl Hittable) -> Color {
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }
 
         let mut rec: HitRecord = Default::default();
-        if world.hit(r, Interval::new(0.001, f64::INFINITY), &mut rec) {
-            let mut scattered = Ray::default();
-            let mut attenuation = Color::default();
-            if rec
-                .material
-                .as_ref()
-                .unwrap()
-                .scatter(r, &rec, &mut attenuation, &mut scattered)
-            {
-                return attenuation * Self::ray_color(&scattered, depth - 1, world);
-            }
-            return Color::new(0.0, 0.0, 0.0);
+        if !world.hit(r, Interval::new(0.001, f64::INFINITY), &mut rec) {
+            return self.background;
         }
 
-        let unit_direction = r.direction().unit_vector();
-        let a = 0.5 * (unit_direction.y() + 1.0);
-        (1.0 - a) * Color::new(1.0, 1.0, 1.0) + a * Color::new(0.5, 0.7, 1.0)
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+        let color_from_emission = rec.material.as_ref().unwrap().emitted(rec.u, rec.v, &rec.p);
+
+        if !rec
+            .material
+            .as_ref()
+            .unwrap()
+            .scatter(r, &rec, &mut attenuation, &mut scattered)
+        {
+            color_from_emission
+        } else {
+            let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
+            color_from_emission + color_from_scatter
+        }
     }
 }
 
@@ -73,6 +76,7 @@ impl Default for Camera {
             image_width: 100,
             samples_per_pixel: 10,
             max_depth: 10,
+            background: Color::new(0.0, 0.0, 0.0),
             vfov: 90.0,
             lookfrom: Point3::new(0.0, 0.0, -1.0),
             lookat: Point3::new(0.0, 0.0, 0.0),
@@ -133,6 +137,11 @@ impl Camera {
 
     pub fn defocus_angle(mut self, defocus_angle: f64) -> Self {
         self.defocus_angle = defocus_angle;
+        self
+    }
+
+    pub fn background(mut self, background: Color) -> Self {
+        self.background = background;
         self
     }
 
@@ -227,7 +236,7 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    pixel_color += Self::ray_color(&r, self.max_depth, world);
+                    pixel_color += self.ray_color(&r, self.max_depth, world);
                 }
                 pixel_color.sample_scale(self.samples_per_pixel);
                 writeln!(file, "{}", pixel_color.gamma())?;

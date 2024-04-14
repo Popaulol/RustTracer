@@ -21,3 +21,9 @@ impl Texture for SolidColor {
         self.color
     }
 }
+
+impl From<Color> for SolidColor {
+    fn from(value: Color) -> Self {
+        Self::new(value)
+    }
+}

@@ -7,10 +7,12 @@ use rand::{thread_rng, Rng};
 use crate::camera::Camera;
 use crate::color::Color;
 use crate::hittable::{BvhNode, HittableList, Quad, Sphere};
-use crate::material::{Dielectric, Lambertian, Metal};
+use crate::material::{Dielectric, DiffuseLight, Lambertian, Metal};
 use crate::point3::Point3;
 use crate::ray::Ray;
-use crate::texture::{CheckerTexture, ImageTexture, MarbleTexture, NoiseTexture};
+use crate::texture::{
+    CheckerTexture, ImageTexture, MarbleTexture, NoiseTexture, SolidColor, Texture,
+};
 use crate::vec3::Vec3;
 
 mod aabb;
@@ -92,9 +94,15 @@ fn random_spheres() -> std::io::Result<()> {
     world.add(Rc::new(Sphere::new(
         Point3::new(4.0, 1.0, 0.0),
         1.0,
-        material3,
+        material3.clone(),
     )));
-
+    /*
+        world.add(Rc::new(Sphere::new(
+            Point3::new(-100.0, 1.0, 0.0),
+            20.0,
+            material3,
+        )));
+    */
     let material4 = Rc::new(Dielectric::new(1.9));
     world.add(Rc::new(Sphere::new(
         Point3::new(8.0, 1.0, 0.0),
@@ -112,8 +120,9 @@ fn random_spheres() -> std::io::Result<()> {
     Camera::default()
         .aspect_ratio(16.0 / 9.0)
         .image_width(1200)
-        .samples_per_pixel(500)
-        .max_depth(100)
+        .samples_per_pixel(5000)
+        .max_depth(10000)
+        .background(Color::new(0.70, 0.80, 1.00))
         .vfov(20.0)
         .lookfrom(Point3::new(13.0, 2.0, 3.0))
         .lookat(Point3::new(0.0, 0.0, 0.0))
@@ -153,6 +162,7 @@ fn two_spheres() -> std::io::Result<()> {
         .image_width(400)
         .samples_per_pixel(100)
         .max_depth(50)
+        .background(Color::new(0.70, 0.80, 1.00))
         .vfov(20.0)
         .lookfrom(Point3::new(13.0, 2.0, 3.0))
         .lookat(Point3::new(0.0, 0.0, 0.0))
@@ -176,6 +186,7 @@ fn earth() {
         .image_width(400)
         .samples_per_pixel(100)
         .max_depth(50)
+        .background(Color::new(0.70, 0.80, 1.00))
         .vfov(20.0)
         .lookfrom(Point3::new(0.0, 0.0, 12.0))
         .lookat(Point3::new(0.0, 0.0, 0.0))
@@ -209,6 +220,7 @@ fn two_perlin_spheres() {
         .image_width(400)
         .samples_per_pixel(100)
         .max_depth(50)
+        .background(Color::new(0.70, 0.80, 1.00))
         .vfov(20.0)
         .lookfrom(Point3::new(12.0, 2.0, 3.0))
         .lookat(Point3::new(0.0, 0.0, 0.0))
@@ -266,6 +278,7 @@ fn quads() {
         .image_width(400)
         .samples_per_pixel(100)
         .max_depth(50)
+        .background(Color::new(0.70, 0.80, 1.00))
         .vfov(80.0)
         .lookfrom(Point3::new(0.0, 0.0, 9.0))
         .lookat(Point3::new(0.0, 0.0, 0.0))
@@ -278,8 +291,56 @@ fn quads() {
         .unwrap();
 }
 
+fn simple_light() {
+    let mut world = HittableList::default();
+
+    let perlin_texture = Rc::new(NoiseTexture::new(4.0));
+    let noise_material = Rc::new(Lambertian::new(perlin_texture));
+
+    let mirror = Rc::new(Dielectric::new(1.0));
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        noise_material.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        noise_material,
+    )));
+
+    let difflight = Rc::new(DiffuseLight::new(Rc::<SolidColor>::new(
+        Color::new(4.0, 4.0, 4.0).into(),
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(3.0, 1.0, -2.0),
+        Vec3::new(2.0, 0.0, 0.0),
+        Vec3::new(0.0, 2.0, 0.0),
+        difflight,
+    )));
+
+    // let world = BvhNode::from_hittable_list(world);
+
+    Camera::default()
+        .aspect_ratio(16.0 / 9.0)
+        .image_width(900)
+        .samples_per_pixel(400)
+        .max_depth(50)
+        .background(Color::new(0.0, 0.0, 0.0))
+        .vfov(20.0)
+        .lookfrom(Point3::new(26.0, 3.0, 6.0))
+        .lookat(Point3::new(0.0, 2.0, 0.0))
+        .vup(Vec3::new(0.0, 1.0, 0.0))
+        .defocus_angle(0.0)
+        .render(
+            format!("renders/{}.ppm", Utc::now().to_rfc2822()).as_str(),
+            &world,
+        )
+        .unwrap();
+}
 fn main() -> std::io::Result<()> {
-    quads();
+    simple_light();
 
     Ok(())
 }
